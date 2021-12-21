@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+    <html>
+       <head>
+          <meta charset="utf-8">
+          <title>Expense Tracker Web App</title>
+          <style>
+          :root {
+              --box-shadow: 0px 1px 4px 1px rgba(199, 199, 199, 1) ;
+              --I: rgb(20, 150, 20) ;
+              --O: rgb(173, 32, 32) ;
+            }
+            #B {
+                color:rgb(52, 52, 180) ;
+            }
+            #I {
+                color: var(--I) ;
+            }
+            #O {
+                color: var(--O) ;
+            }
+            #H {
+                color:rgb(90, 92, 95) ;
+                text-align: center ;
+                text-decoration: underline ;
+                font-size: 22px ; 
+            }
+            body {
+                background-color: whitesmoke ;
+                font-family: sans-serif ;
+            }
+            p {
+                font-style: italic ;
+            }
+            h1 {
+                text-align: center ;
+                font-size: 39px ;
+            }
+            .container {
+                text-align: center ;
+                text-transform: uppercase ;
+                box-shadow: var(--box-shadow) ;
+                padding-top: 3px ;
+                padding-bottom: 18px ;
+                margin-right: auto ;
+                margin-left: auto ;
+            }
+            .container1 {
+                text-align: center ;
+                font-size: 22px ;
+            }
+            .container2 {
+                text-align: center ;
+            }
+            #section1 {
+                box-shadow: var(--box-shadow) ;
+                padding-top: 5px ;
+                padding-bottom: 18px;
+                margin-right: auto ;
+                margin-left: auto ;
+            }
+            #bal {
+                font-size: 25px ;
+            }
+            #In {
+                font-size: 25px ;
+            }
+            #Out {
+                font-size: 25px ;
+            }
+            #list {
+                list-style: none ;
+                text-align: center ;
+            }
+            #form {
+                text-align: center ;
+                word-spacing: 10px ;
+            }
+            .b {
+                text-align: center ;
+            }
+            #list li .iamnt {
+                color: var(--I) ;
+            }
+            #list li .eamnt {
+                color: var(--O) ;
+            }
+            #addincome {
+                background-color: var(--I) ;
+                color: white ;
+                font-size: large ;
+            }
+            #addexpense {
+                background-color: var(--O) ;
+                color: white ;
+                font-size: large ;
+            }
+          </style>
+        </head>
+        <body>
+        <h1>Expense Tracker</h1>
+        <br><br>
+
+        <div class="container">
+            <h2 id="B">Balance</h2>
+            <div id="bal">Rs 1000</div>
+        </div>
+        <br><br>
+
+        <div class="container">
+            <h2 id="I">Income</h2>
+            <div id="In">Rs 2400</div>
+        </div>
+        <br><br>
+
+        <div class="container">
+            <h2 id="O">Expenses</h2>
+            <div id="Out">Rs 1400</div>
+        </div>
+
+        <br><br>
+        <div id="section1">
+            <h3 id="H">History</h3>
+            <br>
+            <ul id="list">
+                <div>
+                    <li>
+                        Earnings
+                        <br>
+                        <div class="container3"><span class="iamnt">Rs 3000</span></div>
+                        <button class="b">Remove</button>
+                        <button class="b">Edit</button>
+                    </div>
+                    </li>
+                    <br><br>
+                    
+                    <div>
+                    <li>
+                        Grocery Shopping
+                        <br>
+                        <div class="container3"><span class="eamnt">Rs 1000</span></div>
+                        <button class="b">Remove</button>
+                        <button class="b">Edit</button>
+                    </div>
+                    </li>
+                    <br><br>
+                    
+                    <div>
+                    <li>
+                        Transport
+                        <br>
+                        <div class="container3"><span class="eamnt">Rs 100</span></div>
+                        <button class="b">Remove</button>
+                        <button class="b">Edit</button>
+                    </div>
+                    </li>  
+            </ul>
+            <br>
+            
+
+            <div>
+                <br>
+                <div class="container1">Add new record</div>
+                <br>
+                <form id="form" onsubmit="return false;">
+                <label for="name">Name</label>
+                <input id="name" type="text">
+                <div>
+                    <br>
+                <label for="amount">Amount</label>
+                <input id="amount" type="number">
+                </form>
+                </div>
+                <br><br>
+                <div class="container2">
+                <button id="addincome">Add Income</button>
+                </div>
+                <br>
+                <div class="container2">
+                <button id="addexpense">Add Expense</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            var state = {
+                Balance: 0 ,
+                Income: 400 ,
+                Expenses: 100 ,
+                Transactions: [
+                    
+                ]
+            }
+            var BalanceEl = document.querySelector("#bal") ;
+            var IncomeEl = document.querySelector("#In") ;
+            var ExpensesEl = document.querySelector("#Out") ;
+            var TransactionsEl = document.querySelector("#list") ;
+            var addincomeEl = document.querySelector("#addincome") ;
+            var addexpenseEl = document.querySelector("#addexpense") ;
+            var nameInputEl = document.querySelector("#name") ;
+            var amountInputEl = document.querySelector("#amount")
+
+            function init() {
+                var localstate = JSON.parse(localStorage.getItem("Expensetrackerstate")) ;
+
+                if (localstate !== null) {
+                    state = localstate ;
+
+                }
+                updateState() ;
+                initlisteners() ;
+            }
+            
+            function uniqueId() {
+                return Math.round(Math.random()*111111) ;
+            }
+
+            function initlisteners () {
+                addincomeEl.addEventListener("click", onAddIncomeClick) ;
+                addexpenseEl.addEventListener("click", onAddExpenseClick) ;
+            }
+
+            function onAddIncomeClick() {
+                var name = nameInputEl.value ;
+                var amount = amountInputEl.value ;
+
+                if(name !=="" && amount !=="") {
+                    var Transaction =  {id: uniqueId(), name: nameInputEl.value, 
+                    amount: parseInt(amountInputEl.value), type: "I"
+                } ;
+                
+                state.Transactions.push(Transaction) ;
+                updateState() ;
+                } else {
+                alert("Enter name and amount") ;
+                }
+
+                nameInputEl.value = "" ;
+                amountInputEl.value = " " ;
+            }
+
+            function onAddExpenseClick() {
+                var name = nameInputEl.value ;
+                var amount = amountInputEl.value ;
+
+                if(name !=="" && amount !=="") {
+                    var Transaction =  {id: uniqueId(), name: nameInputEl.value, 
+                    amount: parseInt(amountInputEl.value), type: "O"
+                } ;
+                
+                state.Transactions.push(Transaction) ;
+                updateState() ;
+                } else {
+                alert("Enter name and amount") ;
+                }
+
+                nameInputEl.value = "" ;
+                amountInputEl.value = " " ;
+
+            function onDeleteClick(event) {
+                var id = event.target.getAttribute('data-id') ;
+                var deletename
+
+                for (var i=0; i<state.Transactions.length; i++) {
+                    if (state.Transactions[i].id==id) {
+                        deletename  = i;
+                        break ;
+                    }
+                }
+
+                state.Trtansactions.splice(deletename, 1) ;
+
+                updateState
+            }
+            }
+
+            function updateState() {
+                var Balance = 0 ,
+                    Income = 0,
+                    Expenses = 0 ,
+                    item ;
+                for (var i=0; i<state.Transactions.length; i++) {
+                    item = state.Transactions[i] ;
+
+                    if (item.type==="I") {
+                        Income += item.amount ;
+                    } else if (item.type==="O") {
+                        Expenses += item.amount
+                    }
+                }
+
+                Balance = Income- Expenses ;
+
+                state.Balance = Balance ;
+                state.Income = Income ;
+                state.Expenses = Expenses ;
+
+                localStorage.setItem("Expensetrackerstate", JSON.stringify(state)) ;
+
+                render() ;
+            }
+
+             function render() {
+                BalanceEl.innerHTML = ("Rs " + state.Balance) ;
+                IncomeEl.innerHTML = ("Rs " + state.Income) ;
+                ExpensesEl.innerHTML = ("Rs " + state.Expenses) ;
+
+                var TransactionEl; container3El; amountEl; bEl
+
+                TransactionsEl.innerHTML = "" ;
+
+                for (var i=0; i<state.Transactions.length; i++) {
+                    item = state.Transactions[i]
+                    TransactionEl = document.createElement("li") ;
+                    TransactionEl.append(item.name) ;
+                    TransactionsEl.appendChild(TransactionEl) ;
+
+                    container3El = document.createElement("div") ;
+                    amountEl = document.createElement("span") ;
+                    if(item.type==="I") {
+                        amountEl.classList.add("iamnt") ;
+                    } else if(item.type==="O") {
+                        amountEl.classList.add("eamnt") ;
+                       
+                        amountEl.innerHTML = ("Rs " + item.amount) ;
+                        
+                        containerEl.appendChild(amountEl) ;
+
+                        bEl = document.createElement("button") ;
+                        bEl.setAttribute("data-id", item.id) ;
+                        bEl.innerHTML = "Add" ;
+
+                        bEl.addEventListener("click", onDeleteClick) ;
+
+                        container3El.appendChild(bEl) ;
+
+                        TransactionEl.appendChild(container3El) ;
+                    }
+                }
+            }
+        </script>
+        </body>
+        </html>
